@@ -1,0 +1,170 @@
+<html>
+
+
+
+    <head>
+        <title>Login Page</title>
+        <style>
+            body{
+                font-family: Arial, sans-serif;
+                background-color: black;
+                margin: 0;
+                padding: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+            }
+            .container {
+                background-color: white;
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+                max-width: 400px;
+                width: 100%;
+                text-align: center;
+            }
+            input[type="text"], input[type="password"] {
+                width: 90%;
+                padding: 10px;
+                margin: 10px 0;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                font-size: 16px;
+            }
+            button {
+                background-color: #007BFF;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                margin-top: 10px;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 16px;
+                width: 100%;
+            }
+            button:hover {
+                background-color: #0056b3;
+            }
+            #userinfo {
+                margin-top: 20px;
+                padding: 10px;
+                background-color: #f9f9f9;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+            }
+            #logout button {
+                background-color: #dc3545;
+                margin-top: 20px;
+            }
+
+            #logout button:hover {
+                background-color: #c82333;
+            }
+
+
+        </style>
+
+
+
+    </head>
+    
+    <body>
+        <div class = "container">
+            <div id="signupblock" class ="block">
+                SignUp!
+                <input id="signupusername" type = "text" placeholder = "username"> 
+                <input id="signuppassword" type ="password" placeholder ="password">
+                <button onclick="signup()">SignUp!</button>
+            </div>
+            <div id ="signinblock" class = "block">
+                SignIn!
+                <input id="signinusername" type = "text" placeholder = "username"> 
+                <input id="signinpassword" type ="password" placeholder ="password">
+                <button onclick="signin()">SignIn!</button>
+            </div>
+            <div id ="userinfo" class="block"> 
+                User Info!
+                <div id="information"></div>
+    
+            </div>
+            <div id ="logout" class = "block">
+                
+                <button onclick = "logout()">LogOut!</button>
+            </div>
+        </div>
+        <script src = "https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
+    <script>
+        async function signup(){
+            const username = document.getElementById("signupusername").value;
+            const password = document.getElementById("signuppassword").value;
+            await axios.post("http://localhost:3000/signup",{
+                username : username,
+                password: password
+            })
+            alert("Sign Up Done!")
+
+
+
+        }
+        async function signin(){
+            const username = document.getElementById("signinusername").value;
+            const password = document.getElementById("signinpassword").value;
+            const response = await axios.post("http://localhost:3000/signin",{
+                username : username,
+                password : password
+            })
+            localStorage.setItem("token",response.data.token)
+            alert("You are signed in!!")
+            showuserinfo()
+
+        }
+        async function getUserInformation(){
+            const response = await axios.get("http://localhost:3000/me",{
+                headers : {
+                    token : localStorage.getItem("token")
+                }
+            })
+            document.getElementById("information").innerHTML = "Username : " + response.data.username + " Password: " + response.data.password
+        }
+        function showuserinfo(){
+            document.getElementById("signupblock").style.display = 'none';
+            document.getElementById("signinblock").style.display = 'none';
+            document.getElementById("userinfo").style.display = 'block';
+            document.getElementById("logout").style.display = 'block';
+            getUserInformation();
+        }
+        function hideuserinfo(){
+            document.getElementById("signupblock").style.display = 'block';
+            document.getElementById("signinblock").style.display = 'block';
+            document.getElementById("userinfo").style.display = 'none';
+            document.getElementById("logout").style.display = 'none';
+
+
+        }
+        if(localStorage.getItem("token")){
+            showuserinfo();
+        }
+        else{
+            hideuserinfo();
+        }
+        
+
+        
+        
+
+
+        async function logout(){
+            localStorage.removeItem("token");
+            alert("You are logged out!")
+            hideuserinfo()
+        }
+    </script>
+
+
+    </body>
+
+
+
+
+</html>
